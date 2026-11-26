@@ -11,7 +11,7 @@ Bộ công cụ xử lý và phục hồi vùng phủ (overlay/watermark) trên 
 | Phiên bản | Môi trường | Cơ chế chính | Ưu điểm |
 | :--- | :--- | :--- | :--- |
 | **V18** (`huy_bao_v18.py`) | Máy tính thường (PC / Laptop) | Tô đen dải trên + lọc màu HSV + EMA + `OpenCV Inpaint` | Nhanh, nhẹ, chạy hàng loạt tốt |
-| **V20** (`huy_bao_v20.py`) | Máy trạm / Siêu máy tính | Cửa sổ thời gian 2 chiều + `DIS Optical Flow` + `LaMa AI` | Tái tạo nền thật từ các frame lân cận |
+
 | **V20.1** (`huy_bao_v20_1.py`) | Máy trạm / Siêu máy tính | Nâng cấp từ V20: tối ưu theo Bounding Box, hỗ trợ thêm mask HSV & kiểm đếm frame | Nhanh và chặt chẽ hơn V20 |
 
 ---
