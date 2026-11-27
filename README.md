@@ -12,7 +12,37 @@ Bộ công cụ dòng lệnh (CLI) xử lý và phục hồi các vùng bị che
 
 ---
 
-## 1. Kiến trúc & Chọn phiên bản phù hợp
+## 1. Bắt đầu nhanh (Quick Start)
+
+Đảm bảo máy đã cài sẵn **FFmpeg**, sau đó sao chép và chạy ngay các lệnh dưới đây:
+
+```bash
+# 1. Cài đặt thư viện cần thiết
+pip install -r requirements_v20.1.txt
+
+# 2. Chạy thử nhanh 15 giây đầu bằng V18 (PC / Laptop thường)
+python Huy_Bao_Game_v18.py input.mp4 preview.mp4 --preview-seconds 15
+
+# 3. Xuất toàn bộ video bằng V18
+python Huy_Bao_Game_v18.py input.mp4 output.mp4
+```
+
+*(Nếu dùng **V20.1 Quality Edition** với ảnh mask PNG và AI LaMa, xem chi tiết ở mục 4B bên dưới).*
+
+---
+
+## 2. Minh họa hiệu quả (Before / After)
+
+| Trước khi xử lý (Before) | Sau khi xử lý (After) |
+| :---: | :---: |
+| ![Before](assets/before.jpg) | ![After](assets/after.jpg) |
+| *Video gốc có thanh trạng thái trên cùng và watermark ở vùng ROI* | *Đã làm sạch dải trên và phục hồi nền vùng watermark mượt mà* |
+
+> **Hướng dẫn hiển thị ảnh trên GitHub:** Bạn hãy tạo thư mục `assets/` trong repo và tải lên 2 ảnh chụp màn hình đặt tên là `before.jpg` và `after.jpg` — bảng trên sẽ tự động hiển thị hình ảnh trực tiếp trên trang chủ dự án.
+
+---
+
+## 3. Kiến trúc & Chọn phiên bản phù hợp
 
 Dự án cung cấp hai phiên bản tối ưu cho hai cấu hình phần cứng khác nhau:
 
@@ -23,22 +53,21 @@ Dự án cung cấp hai phiên bản tối ưu cho hai cấu hình phần cứng
 | **Thuật toán phục hồi** | Bộ lọc EMA thích nghi chuyển cảnh + `OpenCV Inpaint` (`telea` / `ns`) | Cửa sổ thời gian 2 chiều + `DIS Optical Flow` (tối ưu Bounding Box) + dự phòng `LaMa AI` |
 | **Tốc độ & Tài nguyên** | Rất nhanh, nhẹ, phù hợp chạy hàng loạt | Chậm hơn, ưu tiên giữ chi tiết nền thật từ các khung hình lân cận |
 
----
-
-## 2. Cấu trúc kho lưu trữ
+### Cấu trúc kho lưu trữ
 
 ```text
 ├── Huy_Bao_Game_v18.py          # Phiên bản tiêu chuẩn chạy nhanh trên PC/Laptop
 ├── huy_bao_v20_1.py             # Phiên bản chất lượng cao (Temporal Optical Flow + LaMa AI)
 ├── requirements_v20.1.txt       # Thư viện cơ bản (opencv-python, numpy)
 ├── requirements-ai_v20.1.txt    # Thư viện AI tùy chọn cho V20.1 (simple-lama-inpainting, Pillow)
+├── assets/                      # Thư mục chứa ảnh minh họa before.jpg / after.jpg
 ├── LICENSE                      # Toàn văn giấy phép AGPL-3.0
 └── README.md                    # Tài liệu hướng dẫn sử dụng
 ```
 
 ---
 
-## 3. Cài đặt môi trường
+## 4. Cài đặt môi trường chi tiết
 
 ### Bước 1: Cài đặt FFmpeg
 Đảm bảo cả hai lệnh `ffmpeg` và `ffprobe` đã được cài đặt và thêm vào `PATH` của hệ thống:
@@ -64,32 +93,19 @@ Cài đặt **PyTorch** tương thích với phiên bản CUDA của máy chủ 
 pip install -r requirements-ai_v20.1.txt
 ```
 
-Kiểm tra nhận diện GPU CUDA:
-
-```bash
-python -c "import torch; print('CUDA available:', torch.cuda.is_available())"
-```
-
 ---
 
-## 4. Hướng dẫn sử dụng chi tiết
+## 5. Hướng dẫn sử dụng chi tiết
 
 ### A. Phiên bản V18 (`Huy_Bao_Game_v18.py` — Máy tính thường)
 
 **1. Chạy thử nhanh (Preview 15 giây đầu):**
-Luôn nên chạy thử đoạn ngắn để kiểm tra tọa độ `ROI` và chất lượng xử lý trước khi xuất toàn bộ video:
 
 ```bash
 python Huy_Bao_Game_v18.py input.mp4 preview.mp4 --preview-seconds 15
 ```
 
-**2. Chạy toàn bộ video với tham số mặc định:**
-
-```bash
-python Huy_Bao_Game_v18.py input.mp4 output.mp4
-```
-
-**3. Tùy chỉnh vùng ROI, ngưỡng màu HSV và thuật toán Inpaint:**
+**2. Tùy chỉnh vùng ROI, ngưỡng màu HSV và thuật toán Inpaint:**
 
 ```bash
 python Huy_Bao_Game_v18.py input.mp4 output.mp4 \
@@ -102,7 +118,7 @@ python Huy_Bao_Game_v18.py input.mp4 output.mp4 \
   --preset medium
 ```
 
-**4. Chỉ tô đen dải trên, bỏ qua bước Inpaint:**
+**3. Chỉ tô đen dải trên, bỏ qua bước Inpaint:**
 
 ```bash
 python Huy_Bao_Game_v18.py input.mp4 output.mp4 --no-inpaint
@@ -194,14 +210,38 @@ python huy_bao_v20_1.py \
 
 ---
 
-## 5. Lưu ý vận hành
+## 6. Xử lý sự cố & Câu hỏi thường gặp (Troubleshooting & FAQ)
 
-* **Phần cứng chạy V20.1:** `OpenCV DIS Optical Flow` trong các bản cài đặt pip tiêu chuẩn chạy trên CPU; GPU CUDA chủ yếu tăng tốc cho bước suy luận của mô hình `LaMa` (nếu cài bản PyTorch hỗ trợ CUDA).
-* **Video biến thiên tốc độ khung hình (VFR):** V20.1 xuất video tốc độ khung hình cố định (CFR) dựa trên FPS trung bình và sẽ hiển thị cảnh báo nếu phát hiện nguồn có dấu hiệu VFR; hãy kiểm tra lại đồng bộ âm thanh sau khi xuất.
+### Lỗi `Cần cài FFmpeg...` hoặc `'ffprobe' was not found`
+* **Nguyên nhân:** Máy chưa cài FFmpeg hoặc thư mục chứa `ffmpeg` / `ffprobe` chưa được thêm vào biến môi trường `PATH`.
+* **Cách khắc phục:**
+  * **Linux/Ubuntu:** Chạy `sudo apt install -y ffmpeg`.
+  * **Windows:** Tải bản build FFmpeg, giải nén và thêm đường dẫn thư mục `bin\` vào `System Environment Variables -> Path`, sau đó mở lại cửa sổ Terminal.
+
+### Lỗi `ROI (155, 565, 570, 650) không hợp lệ với video ...`
+* **Nguyên nhân:** Tọa độ `--roi X1 Y1 X2 Y2` mặc định của V18 vượt quá kích thước khung hình của video bạn đang xử lý (ví dụ video ngang `1280x720` hoặc video độ phân giải thấp hơn).
+* **Cách khắc phục:** Kiểm tra độ phân giải thực tế của video và truyền lại tọa độ nằm trong kích thước ảnh (`0 <= X1 < X2 <= width`, `0 <= Y1 < Y2 <= height`).
+
+### Lỗi `Mask is WxH, video is ...` ở V20.1
+* **Nguyên nhân:** Ảnh `--mask` PNG không khớp chính xác từng pixel với chiều rộng và chiều cao của video gốc.
+* **Cách khắc phục:** Resize ảnh mask về đúng độ phân giải của video đầu vào và đảm bảo vùng cần xóa tô màu trắng (`255`), vùng giữ nguyên tô màu đen (`0`).
+
+### Lỗi `LaMa could not be initialized` hoặc `CUDA available: False`
+* **Nguyên nhân:** Chưa cài gói `simple-lama-inpainting`, hoặc bản `PyTorch` hiện tại là bản chỉ chạy CPU / không khớp phiên bản driver CUDA của máy.
+* **Cách khắc phục:**
+  * Gỡ bản PyTorch cũ và cài lại đúng lệnh tương ứng với phiên bản CUDA tại [pytorch.org](https://pytorch.org/get-started/locally/).
+  * Nếu máy không có GPU NVIDIA, bạn vẫn có thể chạy V20.1 không cần cờ `--lama` (dùng fallback OpenCV `telea`/`ns`) hoặc dùng bản `Huy_Bao_Game_v18.py`.
+
+### Vì sao V20.1 chạy chậm ngay cả khi đã có GPU?
+* **Giải thích:** Thuật toán `OpenCV DIS Optical Flow` trong các bản cài đặt `opencv-python` tiêu chuẩn qua `pip` chạy hoàn toàn trên **CPU**; GPU CUDA chỉ tăng tốc bước suy luận của mô hình `LaMa`. Để tăng tốc trên video dài, bạn có thể giảm `--flow-quality medium` hoặc `--window 2`.
+
+### Video xuất ra bị lệch tiếng nhẹ ở đoạn cuối (VFR)
+* **Nguyên nhân:** Video quay màn hình điện thoại thường dùng tốc độ khung hình biến thiên (VFR), trong khi pipeline xuất chuẩn tốc độ khung hình cố định (CFR).
+* **Cách khắc phục:** Nếu thấy cảnh báo VFR khi chạy V20.1, hãy kiểm tra lại đoạn cuối video hoặc dùng FFmpeg chuẩn hóa video nguồn về CFR trước khi xử lý.
 
 ---
 
-## 6. Bản quyền & Giấy phép (Copyright & License)
+## 7. Bản quyền & Giấy phép (Copyright & License)
 
 Copyright © 2026 **Huy Bao Game** (`ghuy021112-cpu`). All rights reserved.
 
