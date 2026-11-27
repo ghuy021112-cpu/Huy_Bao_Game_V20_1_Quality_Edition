@@ -14,11 +14,11 @@ Bộ công cụ dòng lệnh (CLI) xử lý và phục hồi các vùng bị che
 
 ## 1. Bắt đầu nhanh (Quick Start)
 
-Đảm bảo máy đã cài sẵn **FFmpeg**, sau đó sao chép và chạy ngay các lệnh dưới đây:
+Đảm bảo máy đã cài sẵn **FFmpeg**, sau đó sao chép và chạy ngay các lệnh dưới đây (Dành cho PC/Laptop phổ thông):
 
 ```bash
-# 1. Cài đặt thư viện cơ bản
-pip install -r requirements_v20.2.txt
+# 1. Cài đặt thư viện cần thiết
+pip install -r requirements_v20.1.txt
 
 # 2. Chạy thử nhanh 15 giây đầu bằng V18 (PC / Laptop thường)
 python Huy_Bao_Game_v18.py input.mp4 preview.mp4 --preview-seconds 15
@@ -225,7 +225,7 @@ python huy_bao_v20_2.py \
 ### C. Những nâng cấp & sửa lỗi chính trong V20.2 (so với V20.1)
 
 * **Sửa lỗi hằng số DIS Optical Flow:** OpenCV chỉ hỗ trợ `ULTRAFAST`, `FAST` và `MEDIUM` (không có `DISOPTICAL_FLOW_PRESET_ULTRA`, gây lỗi ngay từ đầu khi tạo dictionary ánh xạ trong V20.1). Ở V20.2, mức `ultra` dùng preset `MEDIUM` kết hợp `25` vòng lặp gradient descent (`finestScale=0`).
-* **Sửa lỗi kích thước đầu ra của LaMa:** `SimpleLama` tự động đệm ảnh đầu vào lên bội số của `8` pixel gây lệch mảng boolean khi ghép lại. V20.2 cắt ảnh đầu ra về đúng `(original_h, original_w)` trước khi gán.
+* **Sửa lỗi kích thước đầu ra của LaMa:** `SimpleLama` tự động đệm ảnh đầu vào lên bội số của `8` pixel gây lệch mảng boolean khi ghép lại. V20.2 cắt ảnh đầu ra về đúng kích thước vùng ảnh gốc `(original_h, original_w)` trước khi gán.
 * **Kiểm tra tham số sớm & Dọn dẹp an toàn:** Từ chối giá trị `--flow-quality` không hợp lệ trước khi tải mô hình AI; bắt tín hiệu `SIGTERM` để xóa sạch tệp tạm `*_v20_2_*.mp4` (mã thoát `130`); in log tiến độ theo thời gian thực (`flush=True`).
 
 ### D. Kiểm thử tự động (Unit Tests)
