@@ -1,0 +1,3 @@
+# Install PyTorch matching your server CUDA version from https://pytorch.org/get-started/locally/
+simple-lama-inpainting
+Pillow>=10
