@@ -38,7 +38,7 @@ python Huy_Bao_Game_v18.py input.mp4 output.mp4
 | ![Before](assets/before.jpg) | ![After](assets/after.jpg) |
 | *Video gốc có thanh trạng thái trên cùng và watermark ở vùng ROI* | *Đã làm sạch dải trên và phục hồi nền vùng watermark mượt mà* |
 
-> **Hướng dẫn hiển thị ảnh trên GitHub:** Bạn hãy tạo thư mục `assets/` trong repo và tải lên 2 ảnh chụp màn hình đặt tên là `before.jpg` và `after.jpg` — bảng trên sẽ tự động hiển thị hình ảnh trực tiếp trên trang chủ dự án.
+
 
 ---
 
