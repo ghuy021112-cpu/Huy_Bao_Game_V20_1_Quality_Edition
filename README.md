@@ -46,6 +46,8 @@ python Huy_Bao_Game_v18.py input.mp4 output.mp4
 
 Dự án cung cấp hai phiên bản tối ưu cho hai cấu hình phần cứng khác nhau:
 
+> **V20.2** (`huy_bao_v20_2.py`) là bản sửa lỗi của V20.1, cùng thuật toán và cùng tham số dòng lệnh. V20.1 được giữ nguyên làm bản dự phòng. Xem mục 5C.
+
 | Tiêu chí | V18 (`Huy_Bao_Game_v18.py`) | V20.1 Quality Edition (`huy_bao_v20_1.py`) |
 | :--- | :--- | :--- |
 | **Môi trường phần cứng** | Máy tính cá nhân (PC / Laptop CPU) | Máy trạm hiệu năng cao / Siêu máy tính (CPU đa nhân + GPU CUDA) |
@@ -60,6 +62,11 @@ Dự án cung cấp hai phiên bản tối ưu cho hai cấu hình phần cứng
 ├── huy_bao_v20_1.py             # Phiên bản chất lượng cao (Temporal Optical Flow + LaMa AI)
 ├── requirements_v20.1.txt       # Thư viện cơ bản (opencv-python, numpy)
 ├── requirements-ai_v20.1.txt    # Thư viện AI tùy chọn cho V20.1 (simple-lama-inpainting, Pillow)
+├── huy_bao_v20_2.py             # Bản sửa lỗi của V20.1 (khuyến nghị dùng)
+├── requirements_v20.2.txt       # Thư viện cơ bản cho V20.2 (opencv-python-headless, numpy)
+├── requirements-ai_v20.2.txt    # Thư viện AI tùy chọn cho V20.2 (xem hướng dẫn cài --no-deps)
+├── tests/test_v20_2.py          # Bộ kiểm thử tự động cho V20.2
+├── CHANGELOG.md                 # Lịch sử thay đổi
 ├── assets/                      # Thư mục chứa ảnh minh họa before.jpg / after.jpg
 ├── LICENSE                      # Toàn văn giấy phép AGPL-3.0
 └── README.md                    # Tài liệu hướng dẫn sử dụng
@@ -207,6 +214,45 @@ python huy_bao_v20_1.py \
 | `--audio` / `--audio-bitrate` | `aac` / `192k` | Mã hóa âm thanh (`aac` tương thích rộng hoặc `copy` giữ nguyên gốc). |
 | `--crf` / `--preset` | `16` / `slow` | Chất lượng và tốc độ nén `libx264`. |
 | `--progress-every` | `30` | In tiến độ xử lý sau mỗi `N` khung hình. |
+
+### C. Phiên bản V20.2 (`huy_bao_v20_2.py` — Bản sửa lỗi của V20.1)
+
+V20.2 dùng **đúng các tham số dòng lệnh của V20.1**, chỉ cần đổi tên file trong các lệnh ở mục 5B:
+
+```bash
+python huy_bao_v20_2.py --input input.mp4 --output restored.mp4 --mask mask.png --lama
+python huy_bao_v20_2.py --version
+```
+
+**Lỗi đã sửa so với V20.1:**
+* V20.1 dừng ngay với `module 'cv2' has no attribute 'DISOPTICAL_FLOW_PRESET_ULTRA'` ở **mọi** giá trị `--flow-quality`. OpenCV chỉ có `ULTRAFAST`, `FAST`, `MEDIUM`; ở V20.2, `ultra` = preset `MEDIUM` + 25 vòng lặp gradient descent. `fast`/`medium` giữ nguyên hành vi đã định của V20.1 (finest scale 0, 16 vòng lặp).
+* Với `--lama`, V20.1 luôn báo `LaMa failed; OpenCV fallback will be used` vì LaMa trả ảnh đã đệm lên bội số của 8. V20.2 cắt kết quả về đúng kích thước vùng đầu vào, nên LaMa thực sự được dùng.
+* `--flow-quality` không hợp lệ bị từ chối trước khi tải LaMa.
+* Khi tiến trình bị dừng bằng `SIGTERM` (ví dụ `kill`), file tạm `*_v20_2_*.mp4` được xóa (mã thoát 130).
+* Log tiến độ được in ngay (`flush`), không bị giữ trong bộ đệm khi ghi ra file.
+
+**Cài LaMa cho V20.2:** `simple-lama-inpainting` 0.1.2 khai báo `numpy<2`, `pillow<10` và `opencv-python`, nên nếu cài bình thường pip sẽ hạ NumPy/Pillow và cài thêm một gói OpenCV thứ hai. Cài như sau:
+
+```bash
+# PyTorch + torchvision phù hợp CUDA (hoặc bản CPU):
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements-ai_v20.2.txt
+pip install --no-deps simple-lama-inpainting==0.1.2
+```
+
+`pip check` vẫn sẽ báo các ràng buộc phiên bản này; điều đó là bình thường. Chỉ nên có **một** gói OpenCV (`opencv-python-headless`) trong môi trường.
+
+**Kiểm thử:**
+
+```bash
+python -m unittest discover -s tests -v
+HUY_BAO_TEST_LAMA=1 python -m unittest discover -s tests -v   # thêm phép thử LaMa thật
+```
+
+**Giới hạn đã biết (chưa sửa trong V20.2):**
+* Optical flow được tính cả trên vùng watermark đứng yên, nên khi camera chuyển động, chỉ một phần nhỏ điểm ảnh trong mask lấy được nền thật từ khung hình lân cận.
+* Ở cảnh camera đứng yên, LaMa vẽ lại từng khung riêng lẻ nên có thể gây nhấp nháy cục bộ trong vùng mask. Nếu cần ổn định tuyệt đối, chạy không dùng `--lama`.
+* `simple-lama-inpainting` dùng `torch.jit.load`; PyTorch cảnh báo hàm này có thể không ổn định trên Python 3.14+.
 
 ---
 

@@ -1,0 +1,15 @@
+# Optional LaMa dependencies for huy_bao_v20_2.py --lama
+#
+# 1) Install PyTorch + torchvision matching your CUDA version first:
+#    https://pytorch.org/get-started/locally/
+#    (CPU only: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu)
+# 2) pip install -r requirements-ai_v20.2.txt
+# 3) pip install --no-deps simple-lama-inpainting==0.1.2
+#
+# simple-lama-inpainting 0.1.2 declares numpy<2, pillow<10 and opencv-python.
+# Installing it normally would downgrade NumPy/Pillow and add a second OpenCV
+# package next to opencv-python-headless, so it is installed with --no-deps.
+# V20.2 was tested with numpy 2.5, Pillow 13, opencv-python-headless 4.14,
+# torch 2.15 (CPU). `pip check` will still report the declared pins; that is expected.
+Pillow>=10
+fire>=0.5,<0.6
